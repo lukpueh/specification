@@ -1109,13 +1109,14 @@ repo](https://github.com/theupdateframework/specification/issues).
   cycle, report the potential freeze attack.  On the next update cycle, begin
   at step 0 and version N of the root metadata file.
 
-  * **1.9**. **If the timestamp and / or snapshot keys have been rotated, then
-  delete the trusted timestamp and snapshot metadata files.** This is done in
-  order to recover from fast-forward attacks after the repository has been
-  compromised and recovered. A _fast-forward attack_ happens when attackers
-  arbitrarily increase the version numbers of: (1) the timestamp metadata, (2)
-  the snapshot metadata, and / or (3) the targets, or a delegated targets,
-  metadata file in the snapshot metadata. Please see [the Mercury
+  * **1.9**. **If any of the top-level roles other than root have been rotated,
+  then delete the trusted timestamp and snapshot metadata files. Also delete
+  the trusted targets metadata file, if targets keys have been rotated.** This
+  is done in order to recover from fast-forward attacks after the repository
+  has been compromised and recovered. A _fast-forward attack_ happens when
+  attackers arbitrarily increase the version numbers of: (1) the timestamp
+  metadata, (2) the snapshot metadata, and / or (3) the targets, or a delegated
+  targets, metadata file. Please see [the Mercury
   paper](https://ssl.engineering.nyu.edu/papers/kuppusamy-mercury-usenix-2017.pdf)
   for more details.
 
