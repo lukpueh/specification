@@ -1,8 +1,8 @@
 # <p align="center">The Update Framework Specification
 
-Last modified: **26 August 2020**
+Last modified: **15 September 2020**
 
-Version: **1.0.5**
+Version: **1.0.6**
 
 We strive to make the specification easy to implement, so if you come across
 any inconsistencies or experience any difficulty, do let us know by sending an
@@ -1188,26 +1188,31 @@ VERSION_NUMBER is the version number of the snapshot metadata file listed in
 the timestamp metadata file.  In either case, the client MUST write the file to
 non-volatile storage as FILENAME.EXT.
 
-  * **3.1**. **Check against timestamp metadata.** The hashes and version
-  number of the new snapshot metadata file MUST match the hashes (if any) and
-  version number listed in the trusted timestamp metadata.  If hashes and
-  version do not match, discard the new snapshot metadata, abort the update
-  cycle, and report the failure.
+  * **3.1**. **Check against timestamp role's snapshot hash.** The hashes
+  number of the new snapshot metadata file MUST match the hashes (if any)
+  listed in the trusted timestamp metadata.  If hashes and do not match,
+  discard the new snapshot metadata, abort the update cycle, and report the
+  failure.
 
   * **3.2**. **Check signatures.** The new snapshot metadata file MUST have
   been signed by a threshold of keys specified in the trusted root metadata
   file.  If the new snapshot metadata file is not signed as required, discard
   it, abort the update cycle, and report the signature failure.
 
-  * **3.3**. **Check for a rollback attack.**
+  * **3.3**. **Check against timestamp role's snapshot version.** The version
+  number of the new snapshot metadata file MUST match the version number listed
+  in the trusted timestamp metadata.  If version version do not match, discard
+  the new snapshot metadata, abort the update cycle, and report the failure.
 
-    * **3.3.1**. The version number of the trusted snapshot metadata file, if
+  * **3.4**. **Check for a rollback attack.**
+
+    * **3.4.1**. The version number of the trusted snapshot metadata file, if
     any, MUST be less than or equal to the version number of the new snapshot
     metadata file.  If the new snapshot metadata file is older than the trusted
     metadata file, discard it, abort the update cycle, and report the potential
     rollback attack.
 
-    * **3.3.2**. The version number of the targets metadata file, and all
+    * **3.4.2**. The version number of the targets metadata file, and all
     delegated targets metadata files (if any), in the trusted snapshot metadata
     file, if any, MUST be less than or equal to its version number in the new
     snapshot metadata file. Furthermore, any targets metadata filename that was
@@ -1216,7 +1221,7 @@ non-volatile storage as FILENAME.EXT.
     not met, discard the new snapshot metadadata file, abort the update cycle,
     and report the failure.
 
-  * **3.4**. **Check for a freeze attack.** The latest known time should be
+  * **3.5**. **Check for a freeze attack.** The latest known time should be
   lower than the expiration timestamp in the new snapshot metadata file.  If
   so, the new snapshot metadata file becomes the trusted snapshot metadata
   file. If the new snapshot metadata file is expired, discard it, abort the
@@ -1233,48 +1238,54 @@ VERSION_NUMBER is the version number of the targets metadata file listed in the
 snapshot metadata file.  In either case, the client MUST write the file to
 non-volatile storage as FILENAME.EXT.
 
-  * **4.1**. **Check against snapshot metadata.** The hashes and version
-  number of the new targets metadata file MUST match the hashes (if any) and
-  version number listed in the trusted snapshot metadata.  This is done, in
-  part, to prevent a mix-and-match attack by man-in-the-middle attackers.  If
-  the new targets metadata file does not match, discard it, abort the update
-  cycle, and report the failure.
+  * **4.1**. **Check against snapshot role's targets hash.** The hashes
+  of the new targets metadata file MUST match the hashes (if any) listed in the
+  trusted snapshot metadata.  This is done, in part, to prevent a mix-and-match
+  attack by man-in-the-middle attackers.  If the new targets metadata file does
+  not match, discard it, abort the update cycle, and report the failure.
 
   * **4.2**. **Check for an arbitrary software attack.** The new targets
   metadata file MUST have been signed by a threshold of keys specified in the
   trusted root metadata file.  If the new targets metadata file is not signed
   as required, discard it, abort the update cycle, and report the failure.
 
-  * **4.3**. **Check for a freeze attack.** The latest known time should be
+  * **4.3**. **Check against snapshot role's targets version.** The version
+  number of the new targets metadata file MUST match the version number listed
+  in the trusted snapshot metadata.  This is done, in part, to prevent a
+  mix-and-match attack by man-in-the-middle attackers.  If the new targets
+  metadata file does not match, discard it, abort the update cycle, and report
+  the failure.
+
+  * **4.4**. **Check for a freeze attack.** The latest known time should be
   lower than the expiration timestamp in the new targets metadata file.  If so,
   the new targets metadata file becomes the trusted targets metadata file.  If
   the new targets metadata file is expired, discard it, abort the update cycle,
   and report the potential freeze attack.
 
-  * **4.4**. **Perform a preorder depth-first search for metadata about the
+  * **4.5**. **Perform a preorder depth-first search for metadata about the
   desired target, beginning with the top-level targets role.**  Note: If
   any metadata requested in steps 4.4.1 - 4.4.2.3 cannot be downloaded nor
   validated, end the search and report that the target cannot be found.
 
-    * **4.4.1**. If this role has been visited before, then skip this role (so
+    * **4.5.1**. If this role has been visited before, then skip this role (so
     that cycles in the delegation graph are avoided).  Otherwise, if an
     application-specific maximum number of roles have been visited, then go to
     step 5 (so that attackers cannot cause the client to waste excessive
     bandwidth or time).  Otherwise, if this role contains metadata about the
     desired target, then go to step 5.
 
-    * **4.4.2**. Otherwise, recursively search the list of delegations in order
+    * **4.5.2**. Otherwise, recursively search the list of delegations in order
     of appearance.
 
-      * **4.4.2.1**. If the current delegation is a multi-role delegation,
+      * **4.5.2.1**. If the current delegation is a multi-role delegation,
       recursively visit each role, and check that each has signed exactly the
       same non-custom metadata (i.e., length and hashes) about the target (or
       the lack of any such metadata).
 
-      * **4.4.2.2**. If the current delegation is a terminating delegation,
+      * **4.5.2.2**. If the current delegation is a terminating delegation,
       then jump to step 5.
 
-      * **4.4.2.3**. Otherwise, if the current delegation is a non-terminating
+      * **4.5.2.3**. Otherwise, if the current delegation is a non-terminating
       delegation, continue processing the next delegation, if any. Stop the
       search, and jump to step 5 as soon as a delegation returns a result.
 
