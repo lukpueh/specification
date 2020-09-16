@@ -1169,7 +1169,7 @@ as FILENAME.EXT.
     * **2.2.2**. The version number of the snapshot metadata file in the
     trusted timestamp metadata file, if any, MUST be less than or equal to its
     version number in the new timestamp metadata file.  If not, discard the new
-    timestamp metadadata file, abort the update cycle, and report the failure.
+    timestamp metadata file, abort the update cycle, and report the failure.
 
   * **2.3**. **Check for a freeze attack.** The latest known time should be
   lower than the expiration timestamp in the new timestamp metadata file.  If
@@ -1218,7 +1218,7 @@ non-volatile storage as FILENAME.EXT.
     snapshot metadata file. Furthermore, any targets metadata filename that was
     listed in the trusted snapshot metadata file, if any, MUST continue to be
     listed in the new snapshot metadata file.  If any of these conditions are
-    not met, discard the new snapshot metadadata file, abort the update cycle,
+    not met, discard the new snapshot metadata file, abort the update cycle,
     and report the failure.
 
   * **3.5**. **Check for a freeze attack.** The latest known time should be
