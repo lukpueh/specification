@@ -1189,10 +1189,10 @@ the timestamp metadata file.  In either case, the client MUST write the file to
 non-volatile storage as FILENAME.EXT.
 
   * **3.1**. **Check against timestamp role's snapshot hash.** The hashes
-  number of the new snapshot metadata file MUST match the hashes (if any)
-  listed in the trusted timestamp metadata.  If hashes and do not match,
-  discard the new snapshot metadata, abort the update cycle, and report the
-  failure.
+  of the new snapshot metadata file MUST match the hashes listed in the trusted
+  timestamp metadata.  This is done, in part, to prevent a mix-and-match
+  attack by man-in-the-middle attackers.  If the hashes do not match, discard
+  the new snapshot metadata, abort the update cycle, and report the failure.
 
   * **3.2**. **Check signatures.** The new snapshot metadata file MUST have
   been signed by a threshold of keys specified in the trusted root metadata
@@ -1201,8 +1201,8 @@ non-volatile storage as FILENAME.EXT.
 
   * **3.3**. **Check against timestamp role's snapshot version.** The version
   number of the new snapshot metadata file MUST match the version number listed
-  in the trusted timestamp metadata.  If version version do not match, discard
-  the new snapshot metadata, abort the update cycle, and report the failure.
+  in the trusted timestamp metadata.  If the versions do not match, discard the
+  new snapshot metadata, abort the update cycle, and report the failure.
 
   * **3.4**. **Check for a rollback attack.**
 
@@ -1214,7 +1214,7 @@ non-volatile storage as FILENAME.EXT.
 
     * **3.4.2**. The version number of the targets metadata file, and all
     delegated targets metadata files (if any), in the trusted snapshot metadata
-    file, if any, MUST be less than or equal to its version number in the new
+    file, if any, MUST be less than:or equal to its version number in the new
     snapshot metadata file. Furthermore, any targets metadata filename that was
     listed in the trusted snapshot metadata file, if any, MUST continue to be
     listed in the new snapshot metadata file.  If any of these conditions are
@@ -1242,7 +1242,8 @@ non-volatile storage as FILENAME.EXT.
   of the new targets metadata file MUST match the hashes (if any) listed in the
   trusted snapshot metadata.  This is done, in part, to prevent a mix-and-match
   attack by man-in-the-middle attackers.  If the new targets metadata file does
-  not match, discard it, abort the update cycle, and report the failure.
+  not match, discard the new target metadata, abort the update cycle, and
+  report the failure.
 
   * **4.2**. **Check for an arbitrary software attack.** The new targets
   metadata file MUST have been signed by a threshold of keys specified in the
@@ -1251,10 +1252,8 @@ non-volatile storage as FILENAME.EXT.
 
   * **4.3**. **Check against snapshot role's targets version.** The version
   number of the new targets metadata file MUST match the version number listed
-  in the trusted snapshot metadata.  This is done, in part, to prevent a
-  mix-and-match attack by man-in-the-middle attackers.  If the new targets
-  metadata file does not match, discard it, abort the update cycle, and report
-  the failure.
+  in the trusted snapshot metadata.  If the versions do not match, discard it,
+  abort the update cycle, and report the failure.
 
   * **4.4**. **Check for a freeze attack.** The latest known time should be
   lower than the expiration timestamp in the new targets metadata file.  If so,
